@@ -1,0 +1,6 @@
+{
+  "name": "متجر برو - Matjar Pro",
+  "description": "نظام كاشير ذكي ونقاط بيع (POS) يدير متجرك بالكامل من مكان واحد في اليمن - يعمل بدون إنترنت ويدعم الطباعة الحرارية والباركود.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

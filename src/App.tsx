@@ -2,6 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
+// force update 17 Nov
 
 import React, { useState, useEffect, useRef } from 'react';
 import {
@@ -30,6 +31,7 @@ import {
 import { ThermalReceiptDemo } from './components/ThermalReceiptDemo';
 import { ProfitCalculator } from './components/ProfitCalculator';
 import { LowStockAlerts } from './components/LowStockAlerts';
+import { MatjarAssistantChat } from './components/MatjarAssistantChat';
 import { VideoDemoModal, FreeTrialModal } from './components/DemoModals';
 import { DeveloperContactSection } from './components/DeveloperContactSection';
 
@@ -178,6 +180,7 @@ export default function App() {
     { label: 'معاينة الفاتورة الحرارية', href: '#receipt-demo' },
     { label: 'حاسبة الأرباح والهوامش', href: '#profit-calculator' },
     { label: 'تنبيهات نواقص المخزون', href: '#low-stock-alerts' },
+    { label: 'المساعد الذكي (Gemini)', href: '#smart-assistant' },
     { label: 'خطوات التشغيل', href: '#how-it-works' },
     { label: 'باقات الأسعار', href: '#pricing' },
     { label: 'آراء العملاء', href: '#testimonials' },
@@ -1111,6 +1114,9 @@ export default function App() {
             </div>
           </div>
         </section>
+
+        {/* MULTI-TURN GEMINI SMART ASSISTANT CHAT */}
+        <MatjarAssistantChat />
 
         {/* DEVELOPER PROFILE & DIRECT CONTACT CHANNELS (Belal Albahri) */}
         <DeveloperContactSection />

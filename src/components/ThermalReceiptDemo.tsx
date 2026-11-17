@@ -10,6 +10,9 @@ import {
   QrCode,
   WifiOff,
   Store,
+  Settings,
+  MapPin,
+  Phone,
 } from 'lucide-react';
 
 export interface PosProduct {
@@ -85,6 +88,11 @@ export const ThermalReceiptDemo: React.FC = () => {
   const [isPrinting, setIsPrinting] = useState<boolean>(false);
   const [printSuccess, setPrintSuccess] = useState<boolean>(false);
 
+  // Live Customizable Receipt Header Settings
+  const [storeName, setStoreName] = useState<string>('مركز سبأ التجاري للتسوق');
+  const [storePhone, setStorePhone] = useState<string>('775526937');
+  const [storeLocation, setStoreLocation] = useState<string>('مأرب - المدينة - الشارع العام');
+
   const [cart, setCart] = useState<CartItem[]>([
     { ...YEMENI_PRODUCTS[0], qty: 1 },
     { ...YEMENI_PRODUCTS[1], qty: 2 },
@@ -130,6 +138,9 @@ export const ThermalReceiptDemo: React.FC = () => {
       { ...YEMENI_PRODUCTS[3], qty: 1 },
     ]);
     setDiscount(500);
+    setStoreName('مركز سبأ التجاري للتسوق');
+    setStorePhone('775526937');
+    setStoreLocation('مأرب - المدينة - الشارع العام');
     setInvoiceNumber((n) => n + 1);
     setPrintSuccess(false);
   };
@@ -261,8 +272,87 @@ export const ThermalReceiptDemo: React.FC = () => {
               </div>
             </div>
 
-            {/* Active Cart Quantity Controls & Printer Settings */}
+            {/* Active Cart Quantity Controls, Header Customization & Printer Settings */}
             <div className="pt-5 border-t border-[#F9F6F0]/10 space-y-4">
+              {/* Simple Receipt Header Settings Panel */}
+              <div className="bg-[#231911] rounded-xl p-4 border border-[#C9A86A]/30">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2">
+                    <Settings className="w-4 h-4 text-[#C9A86A]" />
+                    <span className="text-xs sm:text-sm font-bold text-[#F9F6F0]">
+                      إعدادات ترويسة الفاتورة (تحديث فوري في المعاينة)
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStoreName('مركز سبأ التجاري للتسوق');
+                      setStorePhone('775526937');
+                      setStoreLocation('مأرب - المدينة - الشارع العام');
+                    }}
+                    className="text-[11px] text-[#C9A86A] hover:underline cursor-pointer"
+                  >
+                    استعادة الافتراضي
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label
+                      htmlFor="receipt-store-name"
+                      className="flex items-center gap-1 text-[11px] font-medium text-[#F9F6F0]/70 mb-1"
+                    >
+                      <Store className="w-3 h-3 text-[#C9A86A]" />
+                      <span>اسم المحل / المتجر</span>
+                    </label>
+                    <input
+                      id="receipt-store-name"
+                      type="text"
+                      value={storeName}
+                      onChange={(e) => setStoreName(e.target.value)}
+                      placeholder="مثال: سوبرماركت النخبة"
+                      className="w-full px-3 py-2 rounded-lg bg-[#2E2118] border border-[#F9F6F0]/15 text-xs font-bold text-[#F9F6F0] placeholder:text-[#F9F6F0]/40 focus:outline-none focus:border-[#C9A86A]"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="receipt-store-phone"
+                      className="flex items-center gap-1 text-[11px] font-medium text-[#F9F6F0]/70 mb-1"
+                    >
+                      <Phone className="w-3 h-3 text-[#C9A86A]" />
+                      <span>رقم الهاتف</span>
+                    </label>
+                    <input
+                      id="receipt-store-phone"
+                      type="tel"
+                      dir="ltr"
+                      value={storePhone}
+                      onChange={(e) => setStorePhone(e.target.value)}
+                      placeholder="775526937"
+                      className="w-full px-3 py-2 rounded-lg bg-[#2E2118] border border-[#F9F6F0]/15 text-xs font-mono tabular-nums font-bold text-right text-[#F9F6F0] placeholder:text-[#F9F6F0]/40 focus:outline-none focus:border-[#C9A86A]"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="receipt-store-location"
+                      className="flex items-center gap-1 text-[11px] font-medium text-[#F9F6F0]/70 mb-1"
+                    >
+                      <MapPin className="w-3 h-3 text-[#C9A86A]" />
+                      <span>الموقع / العنوان</span>
+                    </label>
+                    <input
+                      id="receipt-store-location"
+                      type="text"
+                      value={storeLocation}
+                      onChange={(e) => setStoreLocation(e.target.value)}
+                      placeholder="مأرب - المدينة - الشارع العام"
+                      className="w-full px-3 py-2 rounded-lg bg-[#2E2118] border border-[#F9F6F0]/15 text-xs font-bold text-[#F9F6F0] placeholder:text-[#F9F6F0]/40 focus:outline-none focus:border-[#C9A86A]"
+                    />
+                  </div>
+                </div>
+              </div>
               <div className="flex flex-wrap items-center justify-between gap-4">
                 {/* Thermal Paper Size Selector (Interactive Segmented Control) */}
                 <div>
@@ -425,6 +515,11 @@ export const ThermalReceiptDemo: React.FC = () => {
                 <div className="inline-flex items-center justify-center gap-2 mb-1.5 px-3 py-1 rounded-lg bg-[#F9F6F0] border border-[#C9A86A]/40">
                   <img
                     src="/assets/aistudio/_____1f57c178.jpeg"
+                    onError={(e) => {
+                      if (!e.currentTarget.src.endsWith('/slider/slide-4.svg')) {
+                        e.currentTarget.src = '/slider/slide-4.svg';
+                      }
+                    }}
                     alt="شعار متجر برو - البحري"
                     className="w-7 h-7 object-contain rounded-sm bg-white p-0.5"
                   />
@@ -437,14 +532,14 @@ export const ThermalReceiptDemo: React.FC = () => {
                     </span>
                   </div>
                 </div>
-                <h4 className="text-lg font-extrabold tracking-tight text-[#231911]">
-                  مركز سبأ التجاري للتسوق
+                <h4 className="text-lg font-extrabold tracking-tight text-[#231911] break-words">
+                  {storeName.trim() || 'اسم المتجر التجاري'}
                 </h4>
-                <p className="text-xs text-[#231911]/75 mt-0.5">
-                  مأرب - المدينة - الشارع العام
+                <p className="text-xs text-[#231911]/75 mt-0.5 break-words">
+                  {storeLocation.trim() || 'مأرب - المدينة'}
                 </p>
-                <p className="text-xs text-[#231911]/70 font-mono tabular-nums mt-0.5">
-                  هاتف: 775526937 · فاتورة ضريبية مبسطة
+                <p className="text-xs text-[#231911]/70 font-mono tabular-nums mt-0.5 break-words">
+                  هاتف: {storePhone.trim() || '775526937'} · فاتورة ضريبية مبسطة
                 </p>
               </div>
 

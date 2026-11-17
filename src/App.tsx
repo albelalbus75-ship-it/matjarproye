@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ShoppingCart,
   Barcode,
@@ -14,6 +14,8 @@ import {
   Play,
   Check,
   ChevronDown,
+  ChevronRight,
+  ChevronLeft,
   MessageCircle,
   MapPin,
   Phone,
@@ -26,11 +28,57 @@ import {
   X,
 } from 'lucide-react';
 import { ThermalReceiptDemo } from './components/ThermalReceiptDemo';
+import { ProfitCalculator } from './components/ProfitCalculator';
+import { LowStockAlerts } from './components/LowStockAlerts';
 import { VideoDemoModal, FreeTrialModal } from './components/DemoModals';
 import { DeveloperContactSection } from './components/DeveloperContactSection';
-import heroPosImage from './assets/images/matjar_pos_tablet_hero_1794536337582.jpg';
 
-const HERO_IMAGE_PATH = heroPosImage;
+import slide1DarkOud from './assets/images/matjar_pos_dark_oud_store_1794544757027.jpg';
+import slide2LightStore from './assets/images/matjar_pos_light_modern_store_1794544756193.jpg';
+import slide3TabletPos from './assets/images/matjar_pos_tablet_hero_1794536337582.jpg';
+
+const OFFICIAL_LOGO_PRIMARY = '/slider/slide-4.jpeg';
+const OFFICIAL_LOGO_FALLBACK_1 = '/assets/aistudio/_____1f57c178.jpeg';
+const OFFICIAL_LOGO_FALLBACK_2 = '/slider/slide-4.svg';
+
+interface HeroSlide {
+  id: string;
+  sources: string[];
+  alt: string;
+  fit: string;
+}
+
+const HERO_SLIDES: HeroSlide[] = [
+  {
+    id: 'slide-1',
+    sources: ['/slider/slide-1.jpg', slide1DarkOud, '/slider/slide-1.svg'],
+    alt: 'نقاط البيع - متجر برو (الوضع الداكن الفاخر مع الطابعة الحرارية)',
+    fit: 'object-cover',
+  },
+  {
+    id: 'slide-2',
+    sources: ['/slider/slide-2.jpg', slide2LightStore, '/slider/slide-2.svg'],
+    alt: 'نقاط البيع - متجر برو (الواجهة العصرية المضيئة مع الطابعة الحرارية)',
+    fit: 'object-cover',
+  },
+  {
+    id: 'slide-3',
+    sources: [
+      '/slider/slide-3.jpg',
+      slide3TabletPos,
+      '/assets/aistudio/____________2026-11-13_064049_a25277cd.png',
+      '/slider/slide-3.svg',
+    ],
+    alt: 'نظام كاشير متجر برو على التابلت مع الطابعة الحرارية وقارئ الباركود',
+    fit: 'object-cover',
+  },
+  {
+    id: 'slide-4',
+    sources: [OFFICIAL_LOGO_PRIMARY, OFFICIAL_LOGO_FALLBACK_1, OFFICIAL_LOGO_FALLBACK_2],
+    alt: 'شعار المطور المهندس والمحاسب بلال البحري - متجر برو',
+    fit: 'object-contain bg-white p-8 pb-24',
+  },
+];
 
 export default function App() {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
@@ -38,16 +86,103 @@ export default function App() {
   const [selectedPlan, setSelectedPlan] = useState('الباقة الشهرية (الأكثر طلباً)');
   const [currency, setCurrency] = useState<'YER' | 'SAR'>('YER');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
-  const [heroImgError, setHeroImgError] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Hero Carousel State: continuous 3-second rotation + fallback & skip-on-missing logic
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [slideSourceIdx, setSlideSourceIdx] = useState<Record<string, number>>({});
+  const [skippedSlides, setSkippedSlides] = useState<Record<string, boolean>>({});
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+
+  const activeSlides = HERO_SLIDES.filter((slide) => !skippedSlides[slide.id]);
+  const slidesToRender = activeSlides.length > 0 ? activeSlides : HERO_SLIDES;
+  const totalSlides = slidesToRender.length;
+  const safeSlideIndex = totalSlides > 0 ? currentSlide % totalSlides : 0;
+
+  useEffect(() => {
+    if (totalSlides <= 1) return;
+    const intervalId = window.setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % totalSlides);
+    }, 3000);
+    return () => window.clearInterval(intervalId);
+  }, [totalSlides]);
+
+  const goToNextSlide = () => {
+    if (totalSlides <= 1) return;
+    setCurrentSlide((prev) => (prev + 1) % totalSlides);
+  };
+
+  const goToPrevSlide = () => {
+    if (totalSlides <= 1) return;
+    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
+  };
+
+  const handleSlideImageError = (slide: HeroSlide, slideIdx: number) => {
+    const currentSrcIdx = slideSourceIdx[slide.id] ?? 0;
+    const nextSrcIdx = currentSrcIdx + 1;
+
+    if (nextSrcIdx < slide.sources.length) {
+      setSlideSourceIdx((prev) => ({
+        ...prev,
+        [slide.id]: nextSrcIdx,
+      }));
+    } else {
+      // All local sources for this slide failed: mark skipped and immediately move to next slide
+      setSkippedSlides((prev) => ({
+        ...prev,
+        [slide.id]: true,
+      }));
+      if (slideIdx === safeSlideIndex && totalSlides > 1) {
+        setCurrentSlide((prev) => (prev + 1) % Math.max(1, totalSlides - 1));
+      }
+    }
+  };
+
+  const handleLogoImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if (!img.dataset.fallbackStep) {
+      img.dataset.fallbackStep = '1';
+      img.src = OFFICIAL_LOGO_FALLBACK_1;
+    } else if (img.dataset.fallbackStep === '1') {
+      img.dataset.fallbackStep = '2';
+      img.src = OFFICIAL_LOGO_FALLBACK_2;
+    }
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+    touchEndX.current = null;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX.current === null || touchEndX.current === null) return;
+    const deltaX = touchStartX.current - touchEndX.current;
+    if (Math.abs(deltaX) > 40) {
+      if (deltaX > 0) {
+        goToNextSlide();
+      } else {
+        goToPrevSlide();
+      }
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
 
   const mobileNavLinks = [
     { label: 'المميزات', href: '#features' },
     { label: 'معاينة الفاتورة الحرارية', href: '#receipt-demo' },
+    { label: 'حاسبة الأرباح والهوامش', href: '#profit-calculator' },
+    { label: 'تنبيهات نواقص المخزون', href: '#low-stock-alerts' },
     { label: 'خطوات التشغيل', href: '#how-it-works' },
     { label: 'باقات الأسعار', href: '#pricing' },
     { label: 'آراء العملاء', href: '#testimonials' },
     { label: 'الأسئلة الشائعة', href: '#faq' },
+    { label: 'أنظمة محاسبية وإدارية أخرى', href: '#other-systems' },
     { label: 'المطور وقنوات التواصل', href: '#developer-contact' },
     { label: 'تواصل معنا', href: '#contact' },
   ];
@@ -285,7 +420,8 @@ export default function App() {
           >
             <div className="w-11 h-11 rounded-xl bg-white border-2 border-[#C9A86A] p-1 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform">
               <img
-                src="/assets/aistudio/_____1f57c178.jpeg"
+                src={OFFICIAL_LOGO_PRIMARY}
+                onError={handleLogoImgError}
                 alt="شعار متجر برو - البحري"
                 className="w-full h-full object-contain"
               />
@@ -320,10 +456,22 @@ export default function App() {
               الفاتورة الحرارية
             </a>
             <a
+              href="#profit-calculator"
+              className="hover:text-[#231911] hover:underline underline-offset-8 decoration-[#C9A86A] decoration-2 transition-colors whitespace-nowrap shrink-0"
+            >
+              حاسبة الأرباح
+            </a>
+            <a
               href="#pricing"
               className="hover:text-[#231911] hover:underline underline-offset-8 decoration-[#C9A86A] decoration-2 transition-colors whitespace-nowrap shrink-0"
             >
               الأسعار
+            </a>
+            <a
+              href="#other-systems"
+              className="hover:text-[#231911] hover:underline underline-offset-8 decoration-[#C9A86A] decoration-2 transition-colors whitespace-nowrap shrink-0"
+            >
+              أنظمة محاسبية وإدارية أخرى
             </a>
             <a
               href="#developer-contact"
@@ -419,7 +567,8 @@ export default function App() {
               {/* Integrated Brand & Logo Lockup in Hero */}
               <div className="inline-flex items-center gap-3 self-start mb-5 p-2 pr-2.5 pl-4 rounded-2xl bg-white border border-[#C9A86A]/50 shadow-xs">
                 <img
-                  src="/assets/aistudio/_____1f57c178.jpeg"
+                  src={OFFICIAL_LOGO_PRIMARY}
+                  onError={handleLogoImgError}
                   alt="شعار متجر برو - البحري"
                   className="w-10 h-10 object-contain rounded-lg"
                 />
@@ -480,29 +629,55 @@ export default function App() {
               </div>
             </div>
 
-            {/* Hero Visual Column (6 cols): Tablet POS Dashboard Image + Scrim Caption */}
-            <div className="lg:col-span-6 flex">
-              <div className="relative w-full rounded-2xl overflow-hidden border border-[#231911]/15 bg-[#231911] shadow-xl flex flex-col justify-between min-h-[340px] sm:min-h-[420px]">
-                {!heroImgError ? (
-                  <img
-                    src={HERO_IMAGE_PATH}
-                    alt="لوحة تحكم نظام كاشير متجر برو على الكمبيوتر والتابلت والأندرويد مع طابعة فواتير حرارية وقارئ باركود"
-                    referrerPolicy="no-referrer"
-                    onError={() => setHeroImgError(true)}
-                    className="w-full h-full object-cover lg:h-full"
-                  />
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-gradient-to-br from-[#231911] via-[#2E2118] to-[#160F0A] text-[#F9F6F0]">
-                    <Store className="w-14 h-14 text-[#C9A86A] mb-3" />
-                    <p className="text-lg font-bold">شاشة كاشير متجر برو الذكية</p>
-                    <p className="text-xs text-[#F9F6F0]/70 mt-1">
-                      نقطة بيع سريعة · إدارة المخزون · طباعة حرارية فورية
-                    </p>
-                  </div>
-                )}
+            {/* Hero Visual Column (6 cols): 4-Slide Fade Carousel with Fixed Box, Arrows, Touch Swipe & Dots Below */}
+            <div className="lg:col-span-6 flex flex-col justify-center">
+              {/* Fixed-Size Image Box (Size never changes across slides) */}
+              <div
+                className="relative w-full h-[360px] sm:h-[430px] rounded-2xl overflow-hidden border border-[#231911]/15 bg-[#231911] shadow-xl select-none touch-pan-y"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
+                {/* 4 Stacked Slides with Smooth Fade Transition & Skip-On-Error */}
+                {slidesToRender.map((slide, index) => {
+                  const isActive = index === safeSlideIndex;
+                  const srcIdx = slideSourceIdx[slide.id] ?? 0;
+                  const resolvedSrc = slide.sources[Math.min(srcIdx, slide.sources.length - 1)];
+                  return (
+                    <img
+                      key={slide.id}
+                      src={resolvedSrc}
+                      alt={slide.alt}
+                      draggable={false}
+                      onError={() => handleSlideImageError(slide, index)}
+                      className={`absolute inset-0 w-full h-full ${slide.fit} transition-opacity duration-700 ease-in-out ${
+                        isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+                      }`}
+                    />
+                  );
+                })}
 
-                {/* Measured Dark Gradient Scrim at bottom for high-contrast caption */}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#231911]/95 via-[#231911]/70 to-transparent p-5 sm:p-6 text-[#F9F6F0]">
+                {/* Right & Left Navigation Arrows */}
+                <button
+                  type="button"
+                  onClick={goToPrevSlide}
+                  aria-label="الصورة السابقة"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-[#231911]/75 hover:bg-[#231911] text-[#C9A86A] border border-[#C9A86A]/40 flex items-center justify-center shadow-lg transition-colors cursor-pointer"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={goToNextSlide}
+                  aria-label="الصورة التالية"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-[#231911]/75 hover:bg-[#231911] text-[#C9A86A] border border-[#C9A86A]/40 flex items-center justify-center shadow-lg transition-colors cursor-pointer"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+
+                {/* Stationary Overlay Text & Action Button (Never moves when slides change) */}
+                <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-[#231911] via-[#231911]/85 to-transparent p-5 sm:p-6 text-[#F9F6F0] pointer-events-none">
                   <div className="flex flex-wrap items-end justify-between gap-4">
                     <div>
                       <p className="text-xs text-[#C9A86A] font-bold">
@@ -514,12 +689,37 @@ export default function App() {
                     </div>
                     <a
                       href="#receipt-demo"
-                      className="text-xs font-bold text-[#231911] bg-[#C9A86A] hover:bg-[#d8b97e] px-3.5 py-2 rounded-lg transition-colors whitespace-nowrap shrink-0"
+                      className="pointer-events-auto text-xs font-bold text-[#231911] bg-[#C9A86A] hover:bg-[#d8b97e] px-3.5 py-2 rounded-lg transition-colors whitespace-nowrap shrink-0 shadow-md"
                     >
                       جرب الكاشير الحي بالأسفل
                     </a>
                   </div>
                 </div>
+              </div>
+
+              {/* Small Pagination Dots Under the Image Box */}
+              <div
+                className="flex items-center justify-center gap-2.5 mt-4"
+                role="tablist"
+                aria-label="التنقل بين صور الواجهة الرئيسية"
+              >
+                {slidesToRender.map((slide, index) => {
+                  const isActive = index === safeSlideIndex;
+                  return (
+                    <button
+                      key={slide.id}
+                      type="button"
+                      onClick={() => setCurrentSlide(index)}
+                      aria-label={`عرض الصورة ${index + 1}`}
+                      aria-selected={isActive}
+                      className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
+                        isActive
+                          ? 'w-8 bg-[#231911] border border-[#C9A86A]'
+                          : 'w-2.5 bg-[#231911]/25 hover:bg-[#231911]/50'
+                      }`}
+                    />
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -618,6 +818,12 @@ export default function App() {
 
         {/* EXTRA: Interactive Demo Invoice & Thermal Receipt Preview Card */}
         <ThermalReceiptDemo />
+
+        {/* EXTRA: Interactive Profit Calculator & Margin Reporting Simulation */}
+        <ProfitCalculator onStartTrial={() => handleOpenTrial('تجربة مجانية لمدة 14 يوماً')} />
+
+        {/* EXTRA: Interactive Low Stock Alerts & Supplier WhatsApp Reorder Panel */}
+        <LowStockAlerts />
 
         {/* 5. HOW IT WORKS (3 Steps: سجل متجرك، اضف منتجاتك، ابدأ البيع) */}
         <section id="how-it-works" className="py-16 lg:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1080,7 +1286,8 @@ export default function App() {
             <div className="flex items-center gap-3.5">
               <div className="w-13 h-13 rounded-2xl bg-white border-2 border-[#C9A86A] p-1.5 flex items-center justify-center shrink-0 shadow-md">
                 <img
-                  src="/assets/aistudio/_____1f57c178.jpeg"
+                  src={OFFICIAL_LOGO_PRIMARY}
+                  onError={handleLogoImgError}
                   alt="شعار متجر برو - البحري"
                   className="w-full h-full object-contain"
                 />
@@ -1109,6 +1316,9 @@ export default function App() {
               </a>
               <a href="#pricing" className="hover:text-[#C9A86A] transition-colors">
                 الأسعار
+              </a>
+              <a href="#other-systems" className="hover:text-[#C9A86A] transition-colors">
+                أنظمة محاسبية وإدارية أخرى
               </a>
               <a
                 href="mailto:albahri7755@gmail.com"

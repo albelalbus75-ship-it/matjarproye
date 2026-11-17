@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2E2118"/>
+      <stop offset="100%" stop-color="#1A120B"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg3)"/>
+  <!-- Walnut Wood Counter -->
+  <rect x="0" y="345" width="800" height="155" fill="#3A2618"/>
+  <line x1="0" y1="345" x2="800" y2="345" stroke="#C9A86A" stroke-width="2"/>
+  <!-- Tablet POS on Stand -->
+  <rect x="95" y="100" width="360" height="250" rx="16" fill="#111111" stroke="#C9A86A" stroke-width="2.5"/>
+  <rect x="110" y="114" width="330" height="222" rx="8" fill="#F9F6F0"/>
+  <rect x="110" y="114" width="330" height="34" rx="6" fill="#231911"/>
+  <text x="425" y="136" text-anchor="end" fill="#F9F6F0" font-family="Cairo, sans-serif" font-size="14" font-weight="bold">متجر برو POS · مأرب المدينة</text>
+  <!-- Product Cards Grid inside Tablet -->
+  <rect x="330" y="160" width="95" height="70" rx="8" fill="#FFFFFF" stroke="#C9A86A"/>
+  <text x="377" y="192" text-anchor="middle" fill="#231911" font-family="Cairo, sans-serif" font-size="11" font-weight="bold">عسل سدر يمني</text>
+  <text x="377" y="214" text-anchor="middle" fill="#9A7432" font-family="monospace" font-size="11" font-weight="bold">18,500 ر.ي</text>
+  <rect x="225" y="160" width="95" height="70" rx="8" fill="#FFFFFF" stroke="#C9A86A"/>
+  <text x="272" y="192" text-anchor="middle" fill="#231911" font-family="Cairo, sans-serif" font-size="11" font-weight="bold">بن خولاني فاخر</text>
+  <text x="272" y="214" text-anchor="middle" fill="#9A7432" font-family="monospace" font-size="11" font-weight="bold">6,200 ر.ي</text>
+  <rect x="330" y="240" width="95" height="70" rx="8" fill="#FFFFFF" stroke="#C9A86A"/>
+  <text x="377" y="272" text-anchor="middle" fill="#231911" font-family="Cairo, sans-serif" font-size="11" font-weight="bold">تمر ملكي معبأ</text>
+  <text x="377" y="294" text-anchor="middle" fill="#9A7432" font-family="monospace" font-size="11" font-weight="bold">2,800 ر.ي</text>
+  <rect x="225" y="240" width="95" height="70" rx="8" fill="#FFFFFF" stroke="#C9A86A"/>
+  <text x="272" y="272" text-anchor="middle" fill="#231911" font-family="Cairo, sans-serif" font-size="11" font-weight="bold">شاي كبوس فاخر</text>
+  <text x="272" y="294" text-anchor="middle" fill="#9A7432" font-family="monospace" font-size="11" font-weight="bold">2,400 ر.ي</text>
+  <!-- Left Receipt Summary Column inside Tablet -->
+  <rect x="120" y="160" width="95" height="150" rx="8" fill="#231911"/>
+  <text x="167" y="185" text-anchor="middle" fill="#C9A86A" font-family="Cairo, sans-serif" font-size="11" font-weight="bold">ملخص الفاتورة</text>
+  <text x="167" y="220" text-anchor="middle" fill="#FFFFFF" font-family="monospace" font-size="13" font-weight="bold">29,900 ر.ي</text>
+  <rect x="130" y="245" width="75" height="24" rx="5" fill="#059669"/>
+  <text x="167" y="261" text-anchor="middle" fill="#FFFFFF" font-family="Cairo, sans-serif" font-size="10" font-weight="bold">دفع نقدي</text>
+  <rect x="130" y="275" width="75" height="24" rx="5" fill="#C9A86A"/>
+  <text x="167" y="291" text-anchor="middle" fill="#231911" font-family="Cairo, sans-serif" font-size="10" font-weight="bold">طباعة فورية</text>
+  <!-- Black Thermal Printer & Barcode Scanner -->
+  <rect x="495" y="235" width="145" height="125" rx="10" fill="#18181B" stroke="#C9A86A" stroke-width="1.5"/>
+  <rect x="515" y="165" width="105" height="85" rx="3" fill="#FFFFFF"/>
+  <text x="567" y="188" text-anchor="middle" fill="#231911" font-family="Cairo, sans-serif" font-size="12" font-weight="bold">مركز سبأ التجاري</text>
+  <text x="567" y="208" text-anchor="middle" fill="#231911" font-family="Cairo, sans-serif" font-size="10">مأرب - المدينة</text>
+  <text x="567" y="228" text-anchor="middle" fill="#059669" font-family="monospace" font-size="11" font-weight="bold">29,900 ر.ي</text>
+  <!-- Barcode Scanner -->
+  <rect x="665" y="280" width="85" height="35" rx="14" fill="#111111" stroke="#C9A86A" stroke-width="1.5"/>
+  <rect x="695" y="310" width="24" height="50" rx="6" fill="#1F2937"/>
+</svg>
